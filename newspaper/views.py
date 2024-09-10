@@ -1,7 +1,9 @@
 from datetime import timedelta
+from typing import Any
+from django.db.models.query import QuerySet
 from django.shortcuts import render
 from newspaper.models import Category, Post, Tag
-from django.views.generic import ListView,TemplateView
+from django.views.generic import ListView, TemplateView
 from django.utils import timezone
 
 # Create your views here.
@@ -54,6 +56,7 @@ class HomeView(ListView):
 
 class AboutView(TemplateView):
     template_name = "aznews/about.html"
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["tags"] = Tag.objects.all()[:12]
@@ -65,3 +68,16 @@ class AboutView(TemplateView):
         ).order_by("-views_count")[:3]
 
         return context
+
+
+class PostListView(ListView):
+    model = Post
+    template_name = "aznews/list/list.html"
+    context_object_name = "posts"
+    paginate_by = 1
+
+    def get_queryset(self):
+        return Post.objects.filter(
+            published_at__isnull=False,
+            status="active",
+        ).order_by("-published_at")
