@@ -17,4 +17,19 @@ urlpatterns = [
         views.PostListView.as_view(),
         name="post-list",
     ),
+    path(
+        "post-by-category/<int:category_id>",
+        views.PostByCategory.as_view(),
+        name="post-by-category",
+    ),
+    path(
+        "post-by-tag/<int:tag_id>",
+        views.PostByTag.as_view(),
+        name="post-by-tag",
+    ),
+    path(
+        "contact/",
+        views.ContactView.as_view(),
+        name="contact",
+    ),
 ]

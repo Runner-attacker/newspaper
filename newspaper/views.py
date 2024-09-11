@@ -3,7 +3,7 @@ from typing import Any
 from django.db.models.query import QuerySet
 from django.shortcuts import render
 from newspaper.models import Category, Post, Tag
-from django.views.generic import ListView, TemplateView
+from django.views.generic import ListView, TemplateView, View
 from django.utils import timezone
 
 # Create your views here.
@@ -43,31 +43,11 @@ class HomeView(ListView):
             status="active",
         ).order_by("-published_at")[:7]
 
-        context["tags"] = Tag.objects.all()[:12]
-        context["categories"] = Category.objects.all()[:4]
-
-        context["trending_posts"] = Post.objects.filter(
-            published_at__isnull=False,
-            status="active",
-        ).order_by("-views_count")[:3]
-
         return context
 
 
 class AboutView(TemplateView):
     template_name = "aznews/about.html"
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["tags"] = Tag.objects.all()[:12]
-        context["categories"] = Category.objects.all()[:4]
-
-        context["trending_posts"] = Post.objects.filter(
-            published_at__isnull=False,
-            status="active",
-        ).order_by("-views_count")[:3]
-
-        return context
 
 
 class PostListView(ListView):
@@ -81,3 +61,42 @@ class PostListView(ListView):
             published_at__isnull=False,
             status="active",
         ).order_by("-published_at")
+
+
+class PostByCategory(ListView):
+    model = Post
+    template_name = "aznews/list/list.html"
+    context_object_name = "posts"
+    paginate_by = 1
+
+    def get_queryset(self):
+        query = super().get_queryset()
+        query = query.filter(
+            published_at__isnull=False,
+            status="active",
+            category__id=self.kwargs["category_id"],
+        ).order_by("-published_at")
+        return query
+
+
+class PostByTag(ListView):
+    model = Post
+    template_name = "aznews/list/list.html"
+    context_object_name = "posts"
+    paginate_by = 1
+
+    def get_queryset(self):
+        query = super().get_queryset()
+        query = query.filter(
+            published_at__isnull=False,
+            status="active",
+            tag__id=self.kwargs["tag_id"],
+        ).order_by("-published_at")
+        return query
+
+
+class ContactView(View):
+    template_name = "aznews/contact.html"
+
+    def get(self, request):
+        return render(request,self.template_name)

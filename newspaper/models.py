@@ -16,6 +16,13 @@ class Category(TimeStampModel):
     def __str__(self):
         return self.name
 
+    def get_publishedpost_count(self):
+        return Post.objects.filter(
+            published_at__isnull=False,
+            status="active",
+            category=self,
+        ).count()
+
 
 class Tag(TimeStampModel):
     name = models.CharField(max_length=100)
