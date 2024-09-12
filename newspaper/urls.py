@@ -32,4 +32,9 @@ urlpatterns = [
         views.ContactView.as_view(),
         name="contact",
     ),
+    path(
+        "post-detail/<int:pk>/",
+        views.PostDetailView.as_view(),
+        name="post-detail",
+    ),
 ]

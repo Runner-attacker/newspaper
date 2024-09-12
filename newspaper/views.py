@@ -1,10 +1,12 @@
 from datetime import timedelta
 from typing import Any
 from django.db.models.query import QuerySet
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from newspaper.forms import ContactForm
 from newspaper.models import Category, Post, Tag
-from django.views.generic import ListView, TemplateView, View
+from django.views.generic import ListView, TemplateView, View, DetailView
 from django.utils import timezone
+from django.contrib import messages
 
 # Create your views here.
 
@@ -99,4 +101,37 @@ class ContactView(View):
     template_name = "aznews/contact.html"
 
     def get(self, request):
-        return render(request,self.template_name)
+        return render(request, self.template_name)
+
+    def post(self, request):
+        form = ContactForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request, "Sucessfully Submitted your Query, We will contact you soon."
+            )
+            return redirect("contact")
+        else:
+            messages.error(
+                request,
+                "Cannot submit your query.Please make sure all fields are valid.",
+            )
+            return render(
+                request,
+                self.template_name,
+                {"form": form},
+            )
+
+
+class PostDetailView(DetailView):
+    model = Post
+    template_name = "aznews/detail/detail.html"
+    context_object_name = "post"
+
+    def get_queryset(self):
+        query = super().get_queryset()
+        query = query.filter(
+            published_at__isnull=False,
+            status="active",
+        )
+        return query
