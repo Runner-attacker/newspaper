@@ -58,3 +58,23 @@ class Contact(TimeStampModel):
 
     def __str__(self):
         return self.name
+
+
+class UserProfile(TimeStampModel):
+    user = models.OneToOneField("auth.user", on_delete=models.CASCADE)
+    image = models.ImageField(upload_to="user_images/%Y/%m/%d", blank=False)
+    address = models.CharField(max_length=200)
+    biography = models.TextField()
+
+    def __str__(self):
+        return self.user.username
+
+
+class Comment(TimeStampModel):
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    comment = models.TextField()
+    name = models.CharField(max_length=200)
+    email = models.EmailField()
+
+    def __str__(self):
+        return f"{self.name} | {self.comment[:70]}"
