@@ -10,7 +10,7 @@
       </div>
    {% endif %}
    <form class="form-contact comment_form"
-         action="#"
+         action="{% url 'post-comment' %}"
          id="commentForm"
          method="post">
       {% csrf_token %}
@@ -46,7 +46,7 @@
                       type="email"
                       placeholder="Email"
                       value="{{ form.email.value }}">
-                      {{ form.email.errors }}
+               {{ form.email.errors }}
             </div>
          </div>
       </div>

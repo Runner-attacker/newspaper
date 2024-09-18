@@ -78,3 +78,10 @@ class Comment(TimeStampModel):
 
     def __str__(self):
         return f"{self.name} | {self.comment[:70]}"
+
+
+class Newsletter(TimeStampModel):
+    email = models.EmailField(unique=True)
+
+    def __str__(self):
+        return self.email
