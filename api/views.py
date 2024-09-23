@@ -20,6 +20,7 @@ from api.serializers import (
     PostSerializer,
     PostPublishSerializer,
 )
+from django.db.models import Q
 
 # Create your views here.
 
@@ -87,6 +88,14 @@ class PostViewSet(viewsets.ModelViewSet):
         queryset = super().get_queryset()
         if self.action in ["list", "retrieve"]:
             queryset = queryset.filter(published_at__isnull=False, status="active")
+
+            # get the search term from the request
+            search_term = self.request.query_params.get("search", None)
+            if search_term:
+                # search by title and content (case-insensiitive)
+                queryset = queryset.filter(
+                    Q(title__icontains=search_term) | Q(content__icontains=search_term)
+                )
         return queryset
 
     def get_permissions(self):
